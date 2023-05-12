@@ -55,7 +55,7 @@ def extrude_face(bm, face, translate_forwards=0.0, extruded_face_list=None):
 def ribbed_extrude_face(bm, face, translate_forwards, num_ribs=3, rib_scale=0.9):
     translate_forwards_per_rib = translate_forwards / float(num_ribs)
     new_face = face
-    for i in range(num_ribs):
+    for _ in range(num_ribs):
         new_face = extrude_face(bm, new_face, translate_forwards_per_rib * 0.25)
         new_face = extrude_face(bm, new_face, 0.0)
         scale_face(bm, new_face, rib_scale, rib_scale, rib_scale)
@@ -144,16 +144,15 @@ def add_exhaust_to_face(bm, face):
     scale_outer = 1 / uniform(1.3, 1.6)
     scale_inner = 1 / uniform(1.05, 1.1)
     for face in result['geom']:
-        if isinstance(face, bmesh.types.BMFace):
-            if is_rear_face(face):
-                face.material_index = Material.hull_dark
-                face = extrude_face(bm, face, exhaust_length)
-                scale_face(bm, face, scale_outer, scale_outer, scale_outer)
-                extruded_face_list = []
-                face = extrude_face(bm, face, -exhaust_length * 0.9, extruded_face_list)
-                for extruded_face in extruded_face_list:
-                    extruded_face.material_index = Material.exhaust_burn
-                scale_face(bm, face, scale_inner, scale_inner, scale_inner)
+        if isinstance(face, bmesh.types.BMFace) and is_rear_face(face):
+            face.material_index = Material.hull_dark
+            face = extrude_face(bm, face, exhaust_length)
+            scale_face(bm, face, scale_outer, scale_outer, scale_outer)
+            extruded_face_list = []
+            face = extrude_face(bm, face, -exhaust_length * 0.9, extruded_face_list)
+            for extruded_face in extruded_face_list:
+                extruded_face.material_index = Material.exhaust_burn
+            scale_face(bm, face, scale_inner, scale_inner, scale_inner)
 
 # Given a face, splits it up into a smaller uniform grid and extrudes each grid cell.
 def add_grid_to_face(bm, face):
@@ -401,8 +400,7 @@ class Material(IntEnum):
 def getShaderNode(mat):
     ntree = mat.node_tree
     node_out = ntree.get_output_node('EEVEE')
-    shader_node = node_out.inputs['Surface'].links[0].from_node
-    return shader_node
+    return node_out.inputs['Surface'].links[0].from_node
 
 def getShaderInput(mat, name):
     shaderNode = getShaderNode(mat)

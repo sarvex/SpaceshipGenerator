@@ -12,6 +12,6 @@ with zipfile.ZipFile('add_mesh_SpaceshipGenerator.zip', 'w', zipfile.ZIP_DEFLATE
             'textures/hull_normal.png',
             'textures/hull_lights_emit.png',
             'textures/hull_lights_diffuse.png']:
-        arch.write(pjoin(SRC_DIR, filename), 'add_mesh_SpaceshipGenerator/'+filename)
+        arch.write(pjoin(SRC_DIR, filename), f'add_mesh_SpaceshipGenerator/{filename}')
 
 print('created file: add_mesh_SpaceshipGenerator.zip')
